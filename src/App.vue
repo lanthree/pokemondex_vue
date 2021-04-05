@@ -49,13 +49,14 @@ export default {
   methods: {
     filterNode(value, data) {
       if (!value) return true;
-      if (data.label.indexOf(value) === -1) return false;
+      if (data.match === undefined) return false;
+      if (data.match.indexOf(value) === -1) return false;
 
       if (data.bid === undefined) return true;
       if (this.bid !== "") return true;
 
       this.selected = false;
-      this.bid = data.bid; // TODO
+      this.bid = data.bid;
       this.$nextTick(() => {
         console.log("rendering ", this.bid);
         this.selected = true;

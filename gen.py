@@ -135,8 +135,8 @@ def GetCount():
 
 indexes = []
 for ep in eplist:
-
-    indexes_ep = {"id": count, "label": "地方图鉴", "children": []}
+    area = ep.select("tbody tr th a")[0].get_text().split("（")[0]
+    indexes_ep = {"id": count, "label": area + "图鉴", "children": []}
 
     trs = ep.tbody.select("tr")
     for idx in range(2, len(trs)):
@@ -164,14 +164,12 @@ for ep in eplist:
         index_item = {
             "id": GetCount(),
             "label": title,
-            "bid": "001",
-            "match": no + " " + name + " " + pinyin,
+            "bid": no[1:],
+            "match": no + " " + name + " " + pinyin + " " + pinyin.upper(),
         }
         indexes_ep["children"].append(index_item)
 
         print("{} done".format(title))
-
-        
 
     indexes.append(indexes_ep)
 
