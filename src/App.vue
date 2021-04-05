@@ -157,5 +157,6 @@ body {
   padding: 0;
   margin-top: 5px;
   margin-bottom: 5px;
+  margin-right: 10px;
 }
 </style>
