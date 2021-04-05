@@ -7,11 +7,12 @@
     "main": "./dist/index.html",
     "logo": "pokemon_ball.png",
     "features": [{
-        "code": "poke",
+        "code": "pokedex",
         "explain": "Chrome 书签搜索",
         "cmds": [
             "poke",
-            "口袋妖怪图鉴"
+            "口袋妖怪图鉴",
+            "全国图鉴"
         ]
     }]
 }
