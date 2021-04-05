@@ -9,6 +9,7 @@ import re
 import time
 import pypinyin
 import html2text
+import random
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -61,14 +62,15 @@ def ParsePokeDoc(name, url):
     out_content = html2text.html2text(out_content)
 
     ss = [
-        content_node.select('tr[class="bgl-HP"] div')[1].get_text(),
-        content_node.select('tr[class="bgl-特攻"] div')[1].get_text(),
-        content_node.select('tr[class="bgl-特防"] div')[1].get_text(),
-        content_node.select('tr[class="bgl-速度"] div')[1].get_text(),
-        content_node.select('tr[class="bgl-防御"] div')[1].get_text(),
-        content_node.select('tr[class="bgl-攻击"] div')[1].get_text(),
+        int(content_node.select('tr[class="bgl-HP"] div')[1].get_text()),
+        int(content_node.select('tr[class="bgl-特攻"] div')[1].get_text()),
+        int(content_node.select('tr[class="bgl-特防"] div')[1].get_text()),
+        int(content_node.select('tr[class="bgl-速度"] div')[1].get_text()),
+        int(content_node.select('tr[class="bgl-防御"] div')[1].get_text()),
+        int(content_node.select('tr[class="bgl-攻击"] div')[1].get_text()),
     ]
 
+    print("ParsePokeDoc done")
     return out_content, ss
 
 
@@ -80,6 +82,8 @@ def GetImgUrl(no):
 
     img_url = "https://cn.portal-pokemon.com"
     img_url += soup.body.select(".pokemon-img__front")[0].get("src")
+
+    print("GetImgUrl done")
     return img_url
 
 
@@ -133,48 +137,62 @@ def GetCount():
     return count
 
 
+start_idx = 0
+only_bid = ["019", "020", "030", "031", "034", "432"]
+
 indexes = []
 for ep in eplist:
     area = ep.select("tbody tr th a")[0].get_text().split("（")[0]
-    indexes_ep = {"id": count, "label": area + "图鉴", "children": []}
+    indexes_ep = {"id": GetCount(), "label": area + "图鉴", "children": []}
 
     trs = ep.tbody.select("tr")
     for idx in range(2, len(trs)):
+        global count
+        if count < start_idx:
+            GetCount()
+            continue
+
         no, name, url = ParseTr(trs[idx])
+        if no[1:] not in only_bid:
+            continue
+        
         title = no + " " + name
 
         print("{} start downloading".format(title))
 
         pinyin = GetPinyinFirstLetter(name)
+        try:
+            content, ss = ParsePokeDoc(name, url)
+            data = {
+                "content": content,
+                "url": GetImgUrl(no[1:]),
+                "ss": ss,
+            }
+            data_js = json.dumps(data)
 
-        # content, ss = ParsePokeDoc(name, url)
-        # data = {
-        #     "content": content,
-        #     "url": GetImgUrl(no[1:]),
-        #     "ss": ss,
-        # }
-        # data_js = json.dumps(data)
+            doc_file_path = "./src/assets/data/{}.js".format(no[1:])
+            fo = open(doc_file_path, "w")
+            fo.write("export const data = {}".format(data_js))
+            fo.close()
 
-        # doc_file_path = "./src/assets/data/{}.js".format(no[1:])
-        # fo = open(doc_file_path, "w")
-        # fo.write("export const data = {}".format(data_js))
-        # fo.close()
-        # time.sleep(1)
-
-        index_item = {
-            "id": GetCount(),
-            "label": title,
-            "bid": no[1:],
-            "match": no + " " + name + " " + pinyin + " " + pinyin.upper(),
-        }
-        indexes_ep["children"].append(index_item)
+            index_item = {
+                "id": GetCount(),
+                "label": title,
+                "bid": no[1:],
+                "match": no + " " + name + " " + pinyin + " " + pinyin.upper(),
+            }
+            indexes_ep["children"].append(index_item)
+        except:
+            print("===== ", no[1:])
+            pass
 
         print("{} done".format(title))
+        time.sleep(4)
 
     indexes.append(indexes_ep)
 
-doc_file_path = "./src/assets/data/indexes.js"
-fo = open(doc_file_path, "w")
-indexes_js = json.dumps(indexes)
-fo.write("export const indexes = {}".format(indexes_js))
-fo.close()
+# doc_file_path = "./src/assets/data/indexes.js"
+# fo = open(doc_file_path, "w")
+# indexes_js = json.dumps(indexes)
+# fo.write("export const indexes = {}".format(indexes_js))
+# fo.close()

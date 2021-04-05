@@ -5,7 +5,7 @@
         <img v-bind:src="imgUrl" width="220" height="220" />
       </li>
       <li>
-        <SpeciesStrengthRadar v-bind::ss="ss" />
+        <SpeciesStrengthRadar v-bind:ss="ss" />
       </li>
     </ul>
     <article class="context" v-html="compiledMarkdown"></article>
