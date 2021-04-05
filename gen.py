@@ -60,16 +60,16 @@ def ParsePokeDoc(name, url):
     out_content = "<body><h1>{}</h1>{}</body>".format(name, out_content)
     out_content = html2text.html2text(out_content)
 
-    print(content_node.select('tr[class="bgl-HP"] div')[1])
+    ss = [
+        content_node.select('tr[class="bgl-HP"] div')[1].get_text(),
+        content_node.select('tr[class="bgl-特攻"] div')[1].get_text(),
+        content_node.select('tr[class="bgl-特防"] div')[1].get_text(),
+        content_node.select('tr[class="bgl-速度"] div')[1].get_text(),
+        content_node.select('tr[class="bgl-防御"] div')[1].get_text(),
+        content_node.select('tr[class="bgl-攻击"] div')[1].get_text(),
+    ]
 
-        #.select(".bgl-特攻")
-        #.select(".bgl-特防")
-        #.select(".bgl-速度")
-        #.select(".bgl-防御")
-        #.select(".bgl-攻击")
-
-
-    return out_content, [1,2,3]
+    return out_content, ss
 
 
 def GetImgUrl(no):
@@ -81,10 +81,6 @@ def GetImgUrl(no):
     img_url = "https://cn.portal-pokemon.com"
     img_url += soup.body.select(".pokemon-img__front")[0].get("src")
     return img_url
-
-    # time.sleep(1)
-
-    img = requests.get(img_url)
 
 
 def DownImg(no):
@@ -127,7 +123,21 @@ eplist = (
     .select(".eplist")
 )
 
+
+count = 1
+
+
+def GetCount():
+    global count
+    count += 1
+    return count
+
+
+indexes = []
 for ep in eplist:
+
+    indexes_ep = {"id": count, "label": "地方图鉴", "children": []}
+
     trs = ep.tbody.select("tr")
     for idx in range(2, len(trs)):
         no, name, url = ParseTr(trs[idx])
@@ -135,21 +145,38 @@ for ep in eplist:
 
         print("{} start downloading".format(title))
 
-        content, ss = ParsePokeDoc(name, url)
-        data = {
-            "title": title,
-            "pinyin": GetPinyinFirstLetter(name),
-            "content": content,
-            "url": GetImgUrl(no[1:]),
-            "ss": ss,
-        }
-        data_js = json.dumps(data)
+        pinyin = GetPinyinFirstLetter(name)
 
-        doc_file_path = "./src/assets/data/{}.js".format(no[1:])
-        fo = open(doc_file_path, "w")
-        fo.write("export const data = {}".format(data_js))
-        fo.close()
+        # content, ss = ParsePokeDoc(name, url)
+        # data = {
+        #     "content": content,
+        #     "url": GetImgUrl(no[1:]),
+        #     "ss": ss,
+        # }
+        # data_js = json.dumps(data)
+
+        # doc_file_path = "./src/assets/data/{}.js".format(no[1:])
+        # fo = open(doc_file_path, "w")
+        # fo.write("export const data = {}".format(data_js))
+        # fo.close()
+        # time.sleep(1)
+
+        index_item = {
+            "id": GetCount(),
+            "label": title,
+            "bid": "001",
+            "match": no + " " + name + " " + pinyin,
+        }
+        indexes_ep["children"].append(index_item)
 
         print("{} done".format(title))
 
-        time.sleep(0.5)
+        
+
+    indexes.append(indexes_ep)
+
+doc_file_path = "./src/assets/data/indexes.js"
+fo = open(doc_file_path, "w")
+indexes_js = json.dumps(indexes)
+fo.write("export const indexes = {}".format(indexes_js))
+fo.close()

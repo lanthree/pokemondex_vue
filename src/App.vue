@@ -26,6 +26,7 @@
 
 <script>
 import Content from "./components/Content.vue";
+import { indexes } from "./assets/data/indexes.js";
 
 export default {
   name: "App",
@@ -35,57 +36,7 @@ export default {
       selected: true,
       //
       filterText: "",
-      data: [
-        {
-          id: 1,
-          label: "关都图鉴",
-          children: [
-            {
-              id: 9,
-              label: "三级 1-1-1",
-              bid: "001",
-              match: "",
-            },
-            {
-              id: 10,
-              label: "三级 1-1-2",
-              bid: "002",
-            },
-          ],
-        },
-        {
-          id: 2,
-          label: "成都图鉴",
-          children: [
-            {
-              id: 5,
-              label: "二级 2-1",
-              bid: "003",
-            },
-            {
-              id: 6,
-              label: "二级 2-2",
-              bid: "004",
-            },
-          ],
-        },
-        {
-          id: 3,
-          label: "丰缘图鉴",
-          children: [
-            {
-              id: 7,
-              label: "二级 3-1",
-              bid: "005",
-            },
-            {
-              id: 8,
-              label: "二级 3-2",
-              bid: "006",
-            },
-          ],
-        },
-      ],
+      data: indexes,
       defaultProps: {
         children: "children",
         label: "label",
