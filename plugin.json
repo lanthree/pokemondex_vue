@@ -1,0 +1,17 @@
+{
+    "version": "0.0.2",
+    "pluginName": "口袋妖怪图鉴",
+    "description": "全国图鉴",
+    "author": "lanthree",
+    "homepage": "https://u.tools",
+    "main": "./dist/index.html",
+    "logo": "pokemon_ball.png",
+    "features": [{
+        "code": "poke",
+        "explain": "Chrome 书签搜索",
+        "cmds": [
+            "poke",
+            "口袋妖怪图鉴"
+        ]
+    }]
+}
