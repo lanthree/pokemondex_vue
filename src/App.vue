@@ -21,6 +21,16 @@
             ref="tree"
             v-if="refreshed"
           >
+            <div class="custom-tree-node" slot-scope="{ node }" style="display: flex;">
+              <img
+                v-if="node.data.bid"
+                v-bind:src="require('./assets/icons/' + node.data.bid + '.png')"
+                style="height: 24px; flex:0.3"
+              />
+              <span style="flex: 0.7;">
+                {{ node.label }}
+              </span>
+            </div>
           </el-tree>
         </el-scrollbar>
       </el-aside>

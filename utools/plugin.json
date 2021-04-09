@@ -4,7 +4,7 @@
     "description": "全国图鉴",
     "author": "lanthree",
     "homepage": "https://u.tools",
-    "main": "../dist/index.html",
+    "main": "index.html",
     "logo": "pokemon_ball.png",
     "features": [{
         "code": "pokedex",
