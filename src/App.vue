@@ -49,11 +49,11 @@
 
 <script>
 import Content from "./components/Content.vue";
-import { indexes } from "./assets/data/indexes.js";
 
 export default {
   name: "App",
   data() {
+    const { data } = require("./assets/data/indexes.js")
     return {
       bid: "001",
       selected_label: "001 妙蛙種子",
@@ -61,7 +61,7 @@ export default {
       selected: true,
       //
       filterText: "",
-      data: indexes,
+      data: data,
       defaultProps: {
         children: "children",
         label: "label",
