@@ -93,14 +93,12 @@ export default {
       this.changeBid(data.bid);
     },
     changeBid(bid) {
-      console.log(bid, this.bid, this.selected);
       if (bid === undefined) return;
       if (this.bid !== "") return;
 
       this.selected = false;
       this.bid = bid;
       this.$nextTick(() => {
-        console.log("rendering ", this.bid);
         this.selected = true;
       });
     },
@@ -108,7 +106,6 @@ export default {
       if (this.selected === true) this.bid = "";
     },
     changeFixed(clientHeight) {
-      console.log(clientHeight);
       this.slbHeight = clientHeight - 70 + "px";
       this.contentHeight = clientHeight - 10 + "px";
       this.refreshed = true;

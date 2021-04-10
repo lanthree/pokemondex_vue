@@ -7,15 +7,21 @@
           indicator-position="outside"
           :height="dataHeight"
         >
-          <el-carousel-item  v-for="item in imgUrls.length" :key="item">
-            <img v-bind:src="imgUrls[item-1]" width="220" height="220" />
+          <el-carousel-item v-for="item in bData.urls.length" :key="item">
+            <img v-bind:src="bData.urls[item - 1]" width="220" height="220" />
           </el-carousel-item>
         </el-carousel>
       </li>
       <li>
-        <SpeciesStrengthRadar v-bind:ss="ss" />
+        <SpeciesStrengthRadar v-bind:ss="bData.ss" />
       </li>
     </ul>
+    <h1>{{bData.name}}</h1>
+
+    <div class="tip">
+      <p>{{ bData.story }}</p>
+    </div>
+
     <article class="context" v-html="compiledMarkdown"></article>
   </div>
 </template>
@@ -36,15 +42,13 @@ export default {
   data() {
     const { data } = require("../assets/data/" + this.bid + ".js");
     return {
-      articleDetail: data.content,
-      imgUrls: data.urls,
-      ss: data.ss,
+      bData: data,
       dataHeight: "220px",
     };
   },
   computed: {
     compiledMarkdown() {
-      return marked(this.articleDetail);
+      return marked(this.bData.content);
     },
   },
 };
@@ -82,9 +86,14 @@ li {
 }
 
 .el-carousel {
-    width: 220px;
-    margin: 0 auto;
+  width: 220px;
+  margin: 0 auto;
 }
-
-
+.tip {
+  padding: 8px 16px;
+  background-color: #ecf8ff;
+  border-radius: 4px;
+  border-left: 5px solid #50bfff;
+  margin: 20px 0;
+}
 </style>

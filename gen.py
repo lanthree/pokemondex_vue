@@ -5,11 +5,19 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import sys
+import os
 import re
 import time
 import pypinyin
 import html2text
 import random
+
+import sys
+
+defaultencoding = "utf-8"
+if sys.getdefaultencoding() != defaultencoding:
+    reload(sys)
+    sys.setdefaultencoding(defaultencoding)
 
 
 def ParseTr(tr):
@@ -30,7 +38,7 @@ def ParseTr(tr):
     return no, name, url
 
 
-def ParsePokeDoc(name, url):
+def ParsePokeDoc(url):
 
     response = requests.get("https://wiki.52poke.com/{}".format(url))
     response.enconding = "utf-8"
@@ -46,15 +54,13 @@ def ParsePokeDoc(name, url):
     out_content = ""
     c = content_node.select(".mw-headline")[0].parent.next_sibling
     while True:
-        out_content += str(c)
+        out_content += unicode(c)
         c = c.next_sibling
         if c.name == "h2":
             break
 
     out_content = re.sub(r"href", "none", out_content)
     out_content = re.sub(r"<dl.+dl>", "", out_content)
-
-    out_content = "<body><h1>{}</h1>{}</body>".format(name, out_content)
     out_content = html2text.html2text(out_content)
 
     ss = [
@@ -66,11 +72,11 @@ def ParsePokeDoc(name, url):
         int(content_node.select('tr[class="bgl-攻击"] div')[1].get_text()),
     ]
 
-    print("ParsePokeDoc done")
+    print("ParsePokeDoc ok")
     return out_content, ss
 
 
-def GetImgUrlsAndOther(no):
+def GetOfficalInfo(no):
     response = requests.get("https://cn.portal-pokemon.com/play/pokedex/{}".format(no))
     response.enconding = "utf-8"
 
@@ -81,17 +87,16 @@ def GetImgUrlsAndOther(no):
     for div in soup.body.select(".pokemon-style-box"):
         url = img_url_base + div.a.img.get("src")
         urls.append(url)
-    
+
     if len(urls) == 0:
         url = img_url_base + soup.body.select(".pokemon-img__front")[0].get("src")
         urls.append(url)
 
-    print("GetImgUrls: ", urls)
+    story = soup.body.select(".pokemon-story__body")[0].get_text().strip()
 
-    story = soup.body.select(".pokemon-story__body").get_text()
-    print("GetStory: ", story)
+    print("GetOfficalInfo ok")
+    return urls, story
 
-    return urls
 
 def GetPinyinFirstLetter(name):
     s = ""
@@ -118,15 +123,16 @@ eplist = (
 
 
 global count
-count=0
+count = 0
+
+
 def GetCount():
     global count
     count += 1
     return count
 
 
-start_idx = 200
-#only_bid = ["019", "020", "030", "031", "034", "432"]
+is_retry = True
 
 indexes = []
 for ep in eplist:
@@ -135,29 +141,32 @@ for ep in eplist:
 
     trs = ep.tbody.select("tr")
     for idx in range(2, len(trs)):
-        if count < start_idx:
-            GetCount()
-            continue
 
         no, name, url = ParseTr(trs[idx])
-        #if no[1:] not in only_bid:
-        #    continue
-        
         title = no + " " + name
+        bid = no[1:]
+
+        doc_file_path = "./src/assets/data/{}.js".format(bid)
+        if is_retry and os.path.exists(doc_file_path):
+            print("skip ", title)
+            continue
 
         print("===== {} start downloading".format(title))
 
         pinyin = GetPinyinFirstLetter(name)
         try:
-            content, ss = ParsePokeDoc(name, url)
+            content, ss = ParsePokeDoc(url)
+            urls, story = GetOfficalInfo(bid)
             data = {
+                "bid": bid,
+                "name": name,
                 "content": content,
-                "urls": GetImgUrls(no[1:]),
+                "urls": urls,
+                "story": story,
                 "ss": ss,
             }
             data_js = json.dumps(data)
 
-            doc_file_path = "./src/assets/data/{}.js".format(no[1:])
             fo = open(doc_file_path, "w")
             fo.write("export const data = {}".format(data_js))
             fo.close()
@@ -170,11 +179,10 @@ for ep in eplist:
             }
             indexes_ep["children"].append(index_item)
             print("===== {} done".format(title))
-        except:
-           print("===== error ", no[1:])
-           pass
+        except IOError, e:
+            print("===== error ", no[1:], e)
+            pass
 
-        
         time.sleep(4)
 
     indexes.append(indexes_ep)
