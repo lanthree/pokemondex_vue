@@ -1,24 +1,25 @@
 # pokemon
 
-## Project setup
+基于 [vue2.0](https://cn.vuejs.org/v2/guide/)
+
+### 安装依赖
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### 本地调试
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### 打包utools文件
 ```
-npm run build
+sh install.sh
 ```
+打包到 `./utools_dist/`
 
-### Lints and fixes files
+### 宝可梦数据不全？
 ```
-npm run lint
+python gen.py
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+继续拉下数据，我本地还在测试，当前拉取的数据不全
