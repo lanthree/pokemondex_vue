@@ -179,6 +179,16 @@ for ep in eplist:
         bid = no[1:]
 
         doc_file_path = "./src/assets/data/{}.js".format(bid)
+
+        pinyin = GetPinyinFirstLetter(name)
+        index_item = {
+            "id": GetCount(),
+            "label": title,
+            "bid": no[1:],
+            "match": no + " " + name + " " + pinyin + " " + pinyin.upper(),
+        }
+        indexes_ep["children"].append(index_item)
+
         if is_retry and os.path.exists(doc_file_path):
             AddTypes(doc_file_path, types)
             print("skip ", title)
@@ -186,7 +196,6 @@ for ep in eplist:
 
         print("===== {} start downloading".format(title))
 
-        pinyin = GetPinyinFirstLetter(name)
         try:
             content, ss = ParsePokeDoc(url)
             urls, story = GetOfficalInfo(bid)
@@ -200,14 +209,6 @@ for ep in eplist:
                 "types": types,
             }
             SaveObj(doc_file_path, data)
-
-            index_item = {
-                "id": GetCount(),
-                "label": title,
-                "bid": no[1:],
-                "match": no + " " + name + " " + pinyin + " " + pinyin.upper(),
-            }
-            indexes_ep["children"].append(index_item)
             print("===== {} done".format(title))
         except IOError as e:
             print("===== error ", no[1:], e)
