@@ -16,7 +16,7 @@ npm run serve
 ```
 sh install.sh
 ```
-打包到 `./utools_dist/`
+会打包到 `./utools_dist/`
 
 ### 宝可梦数据不全？
 ```
