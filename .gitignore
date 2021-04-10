@@ -2,6 +2,7 @@
 node_modules
 /dist
 /utool_dist
+/data/big
 
 
 # local env files
