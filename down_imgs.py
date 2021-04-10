@@ -4,8 +4,9 @@ import requests
 from urllib.request import urlretrieve
 import json
 import os
+import time
 
-for id in range(1, 2): #899
+for id in range(1, 899):
     bid = '%03d' % id
     doc_file_path = "./src/assets/data/{}.js".format(bid)
 
@@ -22,3 +23,7 @@ for id in range(1, 2): #899
             continue
 
         urlretrieve(url, img_file_path)
+        print("-- download ", url)
+        time.sleep(3)
+
+    print("download ", bid)
