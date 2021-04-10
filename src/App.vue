@@ -21,13 +21,17 @@
             ref="tree"
             v-if="refreshed"
           >
-            <div class="custom-tree-node" slot-scope="{ node }" style="display: flex;">
+            <div
+              class="custom-tree-node"
+              slot-scope="{ node }"
+              style="display: flex"
+            >
               <img
                 v-if="node.data.bid"
                 v-bind:src="require('./assets/icons/' + node.data.bid + '.png')"
-                style="height: 24px; flex:0.3"
+                style="height: 24px; flex: 0.3"
               />
-              <span style="flex: 0.7;">
+              <span style="flex: 0.7">
                 {{ node.label }}
               </span>
             </div>
@@ -36,7 +40,7 @@
       </el-aside>
       <el-main id="content">
         <el-scrollbar :style="{ height: contentHeight }">
-          <Content :bid="bid" v-if="selected" />
+          <Content :bid="bid" :label="selected_label" v-if="selected" />
         </el-scrollbar>
       </el-main>
     </el-container>
@@ -52,6 +56,8 @@ export default {
   data() {
     return {
       bid: "001",
+      selected_label: "001 妙蛙種子",
+
       selected: true,
       //
       filterText: "",
@@ -65,6 +71,7 @@ export default {
       contentHeight: "",
       timer: false,
       refreshed: false,
+
     };
   },
   components: {

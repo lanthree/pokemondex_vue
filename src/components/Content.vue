@@ -2,7 +2,15 @@
   <div class="hello">
     <ul>
       <li>
-        <img v-bind:src="imgUrl" width="220" height="220" />
+        <el-carousel
+          :autoplay="false"
+          indicator-position="outside"
+          :height="dataHeight"
+        >
+          <el-carousel-item  v-for="item in imgUrls.length" :key="item">
+            <img v-bind:src="imgUrls[item-1]" width="220" height="220" />
+          </el-carousel-item>
+        </el-carousel>
       </li>
       <li>
         <SpeciesStrengthRadar v-bind:ss="ss" />
@@ -20,6 +28,7 @@ export default {
   name: "Content",
   props: {
     bid: String,
+    label: String,
   },
   components: {
     SpeciesStrengthRadar,
@@ -28,8 +37,9 @@ export default {
     const { data } = require("../assets/data/" + this.bid + ".js");
     return {
       articleDetail: data.content,
-      imgUrl: data.url,
+      imgUrls: data.urls,
       ss: data.ss,
+      dataHeight: "220px",
     };
   },
   computed: {
@@ -60,12 +70,21 @@ p {
   word-wrap: break-word;
   word-break: normal;
 }
+
 ul {
   align-content: center;
   float: right;
+  width: 250px;
   margin-block-start: 0;
 }
 li {
   display: inline;
 }
+
+.el-carousel {
+    width: 220px;
+    margin: 0 auto;
+}
+
+
 </style>

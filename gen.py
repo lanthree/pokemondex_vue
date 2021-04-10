@@ -11,15 +11,12 @@ import pypinyin
 import html2text
 import random
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
 
 def ParseTr(tr):
     tds = tr.select("td")
 
     icon_idx = 0
-    for idx in xrange(0, len(tds)):
+    for idx in range(0, len(tds)):
         if len(tds[idx].select("span")) == 1:
             icon_idx = idx
             break
@@ -49,8 +46,7 @@ def ParsePokeDoc(name, url):
     out_content = ""
     c = content_node.select(".mw-headline")[0].parent.next_sibling
     while True:
-        out_content += unicode(c)
-
+        out_content += str(c)
         c = c.next_sibling
         if c.name == "h2":
             break
@@ -74,35 +70,24 @@ def ParsePokeDoc(name, url):
     return out_content, ss
 
 
-def GetImgUrl(no):
+def GetImgUrls(no):
     response = requests.get("https://cn.portal-pokemon.com/play/pokedex/{}".format(no))
     response.enconding = "utf-8"
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    img_url = "https://cn.portal-pokemon.com"
-    img_url += soup.body.select(".pokemon-img__front")[0].get("src")
+    img_url_base = "https://cn.portal-pokemon.com"
+    urls = []
+    for div in soup.body.select(".pokemon-style-box"):
+        url = img_url_base + div.a.img.get("src")
+        urls.append(url)
+    
+    if len(urls) == 0:
+        url = img_url_base + soup.body.select(".pokemon-img__front")[0].get("src")
+        urls.append(url)
 
-    print("GetImgUrl done")
-    return img_url
-
-
-def DownImg(no):
-    response = requests.get("https://cn.portal-pokemon.com/play/pokedex/{}".format(no))
-    response.enconding = "utf-8"
-
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    img_url = "https://cn.portal-pokemon.com"
-    img_url += soup.body.select(".pokemon-img__front")[0].get("src")
-
-    # time.sleep(1)
-
-    img = requests.get(img_url)
-    fo = open("./doc/img/{}.png".format(no), "wb")
-    fo.write(img.content)
-    fo.close()
-
+    print("GetImgUrls: ", urls)
+    return urls
 
 def GetPinyinFirstLetter(name):
     s = ""
@@ -128,17 +113,16 @@ eplist = (
 )
 
 
-count = 1
-
-
+global count
+count=0
 def GetCount():
     global count
     count += 1
     return count
 
 
-start_idx = 0
-only_bid = ["019", "020", "030", "031", "034", "432"]
+start_idx = 200
+#only_bid = ["019", "020", "030", "031", "034", "432"]
 
 indexes = []
 for ep in eplist:
@@ -147,14 +131,13 @@ for ep in eplist:
 
     trs = ep.tbody.select("tr")
     for idx in range(2, len(trs)):
-        global count
         if count < start_idx:
             GetCount()
             continue
 
         no, name, url = ParseTr(trs[idx])
-        if no[1:] not in only_bid:
-            continue
+        #if no[1:] not in only_bid:
+        #    continue
         
         title = no + " " + name
 
@@ -165,7 +148,7 @@ for ep in eplist:
             content, ss = ParsePokeDoc(name, url)
             data = {
                 "content": content,
-                "url": GetImgUrl(no[1:]),
+                "urls": GetImgUrls(no[1:]),
                 "ss": ss,
             }
             data_js = json.dumps(data)
@@ -183,16 +166,16 @@ for ep in eplist:
             }
             indexes_ep["children"].append(index_item)
         except:
-            print("===== ", no[1:])
-            pass
+           print("===== ", no[1:])
+           pass
 
         print("{} done".format(title))
         time.sleep(4)
 
     indexes.append(indexes_ep)
 
-# doc_file_path = "./src/assets/data/indexes.js"
-# fo = open(doc_file_path, "w")
-# indexes_js = json.dumps(indexes)
-# fo.write("export const indexes = {}".format(indexes_js))
-# fo.close()
+doc_file_path = "./src/assets/data/indexes.js"
+fo = open(doc_file_path, "w")
+indexes_js = json.dumps(indexes)
+fo.write("export const indexes = {}".format(indexes_js))
+fo.close()
