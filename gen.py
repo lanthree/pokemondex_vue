@@ -35,7 +35,16 @@ def ParseTr(tr):
     name = wiki_td.select("a")[0].get_text()
     url = wiki_td.select("a")[0].get("href")
 
-    return no, name, url
+    types = []
+    for idx in range(0, len(tds)):
+        if (
+            "class" in tds[idx].attrs
+            and "textwhite" in tds[idx]["class"]
+            and "hide" not in tds[idx]["class"]
+        ):
+            types.append(tds[idx].get_text().strip())
+
+    return no, name, url, types
 
 
 def ParsePokeDoc(url):
@@ -105,6 +114,28 @@ def GetPinyinFirstLetter(name):
     return s
 
 
+def AddTypes(doc_file_path, types):
+    f = open(doc_file_path, "r")
+    data = f.read()
+    f.close()
+
+    obj = json.loads(data[20:])
+    if obj.has_key("types"):
+        return
+
+    obj["types"] = types
+    SaveObj(doc_file_path, obj)
+    print("AddTypes ", doc_file_path)
+
+
+def SaveObj(doc_file_path, obj):
+    obj_js = json.dumps(obj)
+
+    fo = open(doc_file_path, "w")
+    fo.write("export const data = {}".format(obj_js))
+    fo.close()
+
+
 response = requests.get(
     "https://wiki.52poke.com/wiki/%E5%AE%9D%E5%8F%AF%E6%A2%A6%E5%88%97%E8%A1%A8%EF%BC%88%E6%8C%89%E5%85%A8%E5%9B%BD%E5%9B%BE%E9%89%B4%E7%BC%96%E5%8F%B7%EF%BC%89"
 )
@@ -142,12 +173,13 @@ for ep in eplist:
     trs = ep.tbody.select("tr")
     for idx in range(2, len(trs)):
 
-        no, name, url = ParseTr(trs[idx])
+        no, name, url, types = ParseTr(trs[idx])
         title = no + " " + name
         bid = no[1:]
 
         doc_file_path = "./src/assets/data/{}.js".format(bid)
         if is_retry and os.path.exists(doc_file_path):
+            AddTypes(doc_file_path, types)
             print("skip ", title)
             continue
 
@@ -164,12 +196,9 @@ for ep in eplist:
                 "urls": urls,
                 "story": story,
                 "ss": ss,
+                "types": types,
             }
-            data_js = json.dumps(data)
-
-            fo = open(doc_file_path, "w")
-            fo.write("export const data = {}".format(data_js))
-            fo.close()
+            SaveObj(doc_file_path, data)
 
             index_item = {
                 "id": GetCount(),
@@ -188,7 +217,4 @@ for ep in eplist:
     indexes.append(indexes_ep)
 
 doc_file_path = "./src/assets/data/indexes.js"
-fo = open(doc_file_path, "w")
-indexes_js = json.dumps(indexes)
-fo.write("export const indexes = {}".format(indexes_js))
-fo.close()
+SaveObj(doc_file_path, indexes)

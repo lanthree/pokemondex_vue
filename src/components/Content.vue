@@ -6,17 +6,34 @@
           :autoplay="false"
           indicator-position="outside"
           :height="dataHeight"
+          @change="changeSlide"
         >
           <el-carousel-item v-for="item in bData.urls.length" :key="item">
-            <img v-bind:src="bData.urls[item - 1]" width="220" height="220" />
+            <transition name="el-fade-in">
+              <img
+                v-bind:src="bData.urls[item - 1]"
+                width="220"
+                height="220"
+                v-show="item - 1 === showSlideIdx"
+              />
+            </transition>
           </el-carousel-item>
         </el-carousel>
       </li>
       <li>
-        <SpeciesStrengthRadar v-bind:ss="bData.ss" />
+        <div v-if="bData.types" class="types-wrapper">
+          <TypeLogo
+            v-for="item in bData.types.length"
+            :typeName="bData.types[item - 1]"
+            v-bind:key="item"
+          />
+        </div>
+      </li>
+      <li>
+        <SpeciesStrengthRadar v-bind:ss="bData.ss" class="li-ss" />
       </li>
     </ul>
-    <h1>{{bData.name}}</h1>
+    <h1>{{ bData.name }}</h1>
 
     <div class="tip">
       <p>{{ bData.story }}</p>
@@ -28,6 +45,7 @@
 
 <script>
 import SpeciesStrengthRadar from "./SpeciesStrengthRadar.vue";
+import TypeLogo from "./TypeLogo.vue";
 import marked from "marked";
 
 export default {
@@ -38,17 +56,24 @@ export default {
   },
   components: {
     SpeciesStrengthRadar,
+    TypeLogo,
   },
   data() {
     const { data } = require("../assets/data/" + this.bid + ".js");
     return {
       bData: data,
       dataHeight: "220px",
+      showSlideIdx: 0,
     };
   },
   computed: {
     compiledMarkdown() {
       return marked(this.bData.content);
+    },
+  },
+  methods: {
+    changeSlide(newIdx) {
+      this.showSlideIdx = newIdx;
     },
   },
 };
@@ -83,6 +108,9 @@ ul {
 }
 li {
   display: inline;
+  margin: 0px;
+  padding: 0px;
+  list-style: none;
 }
 
 .el-carousel {
@@ -95,5 +123,12 @@ li {
   border-radius: 4px;
   border-left: 5px solid #50bfff;
   margin: 20px 0;
+}
+.types-wrapper {
+  text-align: center;
+  width: 100%;
+}
+.li-ss {
+  margin-top: 30px;
 }
 </style>

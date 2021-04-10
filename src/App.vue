@@ -71,7 +71,6 @@ export default {
       contentHeight: "",
       timer: false,
       refreshed: false,
-
     };
   },
   components: {
