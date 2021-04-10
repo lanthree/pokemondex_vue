@@ -70,7 +70,7 @@ def ParsePokeDoc(name, url):
     return out_content, ss
 
 
-def GetImgUrls(no):
+def GetImgUrlsAndOther(no):
     response = requests.get("https://cn.portal-pokemon.com/play/pokedex/{}".format(no))
     response.enconding = "utf-8"
 
@@ -87,6 +87,10 @@ def GetImgUrls(no):
         urls.append(url)
 
     print("GetImgUrls: ", urls)
+
+    story = soup.body.select(".pokemon-story__body").get_text()
+    print("GetStory: ", story)
+
     return urls
 
 def GetPinyinFirstLetter(name):
@@ -141,7 +145,7 @@ for ep in eplist:
         
         title = no + " " + name
 
-        print("{} start downloading".format(title))
+        print("===== {} start downloading".format(title))
 
         pinyin = GetPinyinFirstLetter(name)
         try:
@@ -165,11 +169,12 @@ for ep in eplist:
                 "match": no + " " + name + " " + pinyin + " " + pinyin.upper(),
             }
             indexes_ep["children"].append(index_item)
+            print("===== {} done".format(title))
         except:
-           print("===== ", no[1:])
+           print("===== error ", no[1:])
            pass
 
-        print("{} done".format(title))
+        
         time.sleep(4)
 
     indexes.append(indexes_ep)
