@@ -4,6 +4,7 @@
       <el-aside style="width: 230px">
         <div class="search">
           <el-input
+            v-if="renderSearcher"
             autofocus="true"
             placeholder="输入关键字进行过滤"
             v-model="filterText"
@@ -57,7 +58,6 @@ export default {
     return {
       bid: "001",
       selected_label: "001 妙蛙種子",
-
       selected: true,
       //
       filterText: "",
@@ -74,6 +74,7 @@ export default {
       width_timer: false,
       alpha_201_sheet: null,
       refreshed: false,
+      renderSearcher: true,
     };
   },
   components: {
@@ -110,7 +111,10 @@ export default {
     changeFixed(clientHeight, clientWidth) {
       if (clientHeight != -1) {
         // 自适应的滚动条高度
-        this.slbHeight = clientHeight - 70 + "px";
+        this.slbHeight = clientHeight - 60 + "px";
+        if (!this.renderSearcher) {
+          this.slbHeight = clientHeight - 20 + "px";
+        }
         this.contentHeight = clientHeight - 10 + "px";
       }
       if (clientWidth != -1) {
@@ -125,7 +129,7 @@ export default {
         } else {
           this.alpha_201_sheet.deleteRule(0);
         }
-        var img_width = (clientWidth-230-250-120) / 7;
+        var img_width = (clientWidth - 230 - 250 - 120) / 7;
         this.alpha_201_sheet.insertRule(
           "#alpha-201 img{width:" + img_width + "px}"
         );
@@ -135,12 +139,22 @@ export default {
     },
   },
   mounted() {
-    const that = this;
+    if (window.utools) {
+      this.renderSearcher = false;
+      window.utools.onPluginEnter(() => {
+        window.utools.setSubInput(({ text }) => {
+          console.log(text);
+          this.$refs.tree.filter(text);
+        });
+      });
+    }
+
     this.changeFixed(
       `${document.documentElement.clientHeight}`,
       `${document.documentElement.clientWidth}`
     );
 
+    const that = this;
     window.onresize = () => {
       return (() => {
         that.clientHeight = `${document.documentElement.clientHeight}`;
@@ -197,9 +211,6 @@ body {
 }
 .el-aside {
   margin: 10px;
-}
-#pokedex {
-  margin-top: 10px;
 }
 .search {
   margin-left: 10px;

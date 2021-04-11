@@ -1,16 +1,16 @@
 {
     "version": "0.0.4",
     "pluginName": "口袋妖怪图鉴",
-    "description": "全国图鉴",
+    "description": "口袋妖怪图鉴",
     "author": "lanthree",
     "homepage": "https://u.tools",
     "main": "index.html",
     "logo": "pokemon_ball.png",
     "features": [{
         "code": "pokedex",
-        "explain": "Chrome 书签搜索",
+        "explain": "口袋妖怪全国图鉴搜索，搜索关键字支持 全国图鉴标号、宝可梦中文名、宝可梦中文名拼音的首字母",
         "cmds": [
-            "poke",
+            "pokedex",
             "口袋妖怪图鉴",
             "全国图鉴"
         ]
