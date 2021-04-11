@@ -53,7 +53,7 @@ import Content from "./components/Content.vue";
 export default {
   name: "App",
   data() {
-    const { data } = require("./assets/data/indexes.js")
+    const { data } = require("./assets/data/indexes.js");
     return {
       bid: "001",
       selected_label: "001 妙蛙種子",
@@ -67,9 +67,12 @@ export default {
         label: "label",
       },
       clientHeight: "", //浏览器可视区域高度
+      clientWidth: "",
       slbHeight: "",
       contentHeight: "",
-      timer: false,
+      height_timer: false,
+      width_timer: false,
+      alpha_201_sheet: null,
       refreshed: false,
     };
   },
@@ -104,19 +107,44 @@ export default {
     clearBig() {
       if (this.selected === true) this.bid = "";
     },
-    changeFixed(clientHeight) {
-      this.slbHeight = clientHeight - 70 + "px";
-      this.contentHeight = clientHeight - 10 + "px";
+    changeFixed(clientHeight, clientWidth) {
+      if (clientHeight != -1) {
+        // 自适应的滚动条高度
+        this.slbHeight = clientHeight - 70 + "px";
+        this.contentHeight = clientHeight - 10 + "px";
+      }
+      if (clientWidth != -1) {
+        // 自适应的未知图腾的字母表table的图片大小
+        // 通过后续增加style元素实现
+        // -- Q: 为什么不直接get元素？A: mounted时get不到元素 还未渲染到
+        if (this.alpha_201_sheet == null) {
+          var style = document.createElement("style");
+          style.appendChild(document.createTextNode(""));
+          document.head.appendChild(style);
+          this.alpha_201_sheet = style.sheet;
+        } else {
+          this.alpha_201_sheet.deleteRule(0);
+        }
+        var img_width = (clientWidth-230-250-120) / 7;
+        this.alpha_201_sheet.insertRule(
+          "#alpha-201 img{width:" + img_width + "px}"
+        );
+      }
+
       this.refreshed = true;
     },
   },
   mounted() {
     const that = this;
-    this.changeFixed(`${document.documentElement.clientHeight}`);
+    this.changeFixed(
+      `${document.documentElement.clientHeight}`,
+      `${document.documentElement.clientWidth}`
+    );
 
     window.onresize = () => {
       return (() => {
         that.clientHeight = `${document.documentElement.clientHeight}`;
+        that.clientWidth = `${document.documentElement.clientWidth}`;
       })();
     };
   },
@@ -125,13 +153,24 @@ export default {
       this.$refs.tree.filter(val);
     },
     clientHeight(val) {
-      if (!this.timer) {
+      if (!this.height_timer) {
         //如果clientHeight 发生改变，这个函数就会运行
-        this.changeFixed(val);
-        this.timer = true;
+        this.changeFixed(val, -1);
+        this.height_timer = true;
         let _this = this;
         setTimeout(function () {
-          _this.timer = false;
+          _this.height_timer = false;
+        }, 100);
+      }
+    },
+    clientWidth(val) {
+      if (!this.width_timer) {
+        //如果clientWidth 发生改变，这个函数就会运行
+        this.changeFixed(-1, val);
+        this.width_timer = true;
+        let _this = this;
+        setTimeout(function () {
+          _this.width_timer = false;
         }, 100);
       }
     },
