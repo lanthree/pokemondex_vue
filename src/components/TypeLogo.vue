@@ -1,5 +1,5 @@
 <template>
-  <div class="logo-wrapper">
+  <div class="logo-wrapper" :style="LWStypeObject">
     <span class="left-1" :style="L1StyleObject" />
     <span class="left-2" :style="L2StyleObject" />
     <span class="logo-img-wrapper">
@@ -22,9 +22,13 @@ export default {
     },
   },
   data() {
-    var logoColor = this.GetColorByTypeName();
+    var logoColor = this.GetLogoColorByTypeName();
+    var backColor = this.GetBackColorByTypeName();
 
     return {
+      LWStypeObject: {
+        backgroundColor: backColor,
+      },
       L1StyleObject: {
         backgroundColor: logoColor,
       },
@@ -36,46 +40,88 @@ export default {
     };
   },
   methods: {
-    GetColorByTypeName() {
+    GetLogoColorByTypeName() {
       switch (this.typeName) {
         case "一般":
-          return "#9199A1";
+          return "#909ca2";
         case "格斗":
-          return "#CD406A";
+          return "#ce4267";
         case "飞行":
-          return "#8EA8DE";
+          return "#90a9dc";
         case "毒":
-          return "#A96AC8";
+          return "#a96ac9";
         case "地面":
-          return "#D87844";
+          return "#d97846";
         case "岩石":
-          return "#C5B78B";
+          return "#c6b88a";
         case "虫":
-          return "#91C12E";
+          return "#91c12c";
         case "幽灵":
-          return "#5369AC";
+          return "#526aad";
         case "钢":
-          return "#5A8DA1";
+          return "#5a8fa3";
         case "火":
-          return "#FE927D";
+          return "#ff9d54";
         case "水":
-          return "#4f90d5";
+          return "#4e92d2";
         case "草":
-          return "#62BB5A";
+          return "#63bc5a";
         case "电":
-          return "#F3D23B";
+          return "#f4d43b";
         case "超能力":
-          return "#F87178";
+          return "#fb717b";
         case "冰":
-          return "#73CEBF";
+          return "#73d0bd";
         case "龙":
-          return "#0D6DC2";
+          return "#0c6cc4";
         case "恶":
-          return "#5A5265";
+          return "#5a5467";
         case "妖精":
-          return "#EB8FE6";
+          return "#ed91e3";
         default:
           return "#9199A1";
+      }
+    },
+    GetBackColorByTypeName() {
+      switch (this.typeName) {
+        case "一般":
+          return "#4c504f";
+        case "格斗":
+          return "#594149";
+        case "飞行":
+          return "#4d515a";
+        case "毒":
+          return "#524858";
+        case "地面":
+          return "#5b4940";
+        case "岩石":
+          return "#58554e";
+        case "虫":
+          return "#4d553e";
+        case "幽灵":
+          return "#424953";
+        case "钢":
+          return "#444d52";
+        case "火":
+          return "#605043";
+        case "水":
+          return "#424e5a";
+        case "草":
+          return "#445547";
+        case "电":
+          return "#5d5a42";
+        case "超能力":
+          return "#5e484a";
+        case "冰":
+          return "#465858";
+        case "龙":
+          return "#374957";
+        case "恶":
+          return "#44454a";
+        case "妖精":
+          return "#5c4e5d";
+        default:
+          return "#4c504f";
       }
     },
   },
@@ -87,10 +133,10 @@ export default {
   background-color: #5f4f44;
   color: white;
   font-size: 13px;
-  padding-left: 20px;
+  padding-left: 25px;
   width: 40px;
   height: 20px;
-  border-radius: 6px;
+  border-radius: 1px;
   vertical-align: middle;
   text-align: center;
   position: relative;
@@ -102,24 +148,25 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  width: 17px;
+  width: 22px;
   height: 20px;
 }
 .left-2 {
   position: absolute;
   top: 0;
-  left: 17px;
-  border-width: 10px 3px;
+  left: 21px;
+  border-width: 11px 4px;
   border-style: solid;
 }
 .logo-img-wrapper {
   position: absolute;
-  top: -1;
-  left: 0;
+  top: 1px;
+  left: 3px;
+  text-align: center;
 }
 .logo-img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 .type-name {
   line-height: 20px;
